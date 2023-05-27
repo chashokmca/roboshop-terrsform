@@ -9,7 +9,7 @@ data "aws_ami" "centos" {
 }
 
 data "aws_security_group" "selected" {
-  id = "sg-0d5c740b322bfa5ca"
+  name = "allow-all"
 }
 
 variable "instance_type" {
@@ -20,7 +20,7 @@ resource "aws_instance" "frontend" {
   count   = length(var.components)
   ami           = data.aws_ami.centos.image_id
   instance_type = var.instance_type
-  vpc_security_group_ids = [data.aws_security_group.selected.description]
+  vpc_security_group_ids = [data.aws_security_group.selected.id]
 
   tags = {
     Name = var.components[count]
