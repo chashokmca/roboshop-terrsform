@@ -76,18 +76,27 @@ resource "aws_instance" "instance" {
   }
 }
 
-resource "aws_route53_record" "instance" {
-  name    = "frontend-dev.adevops72.online"
+resource "aws_route53_record" "records" {
+  for_each = var.instances
+  name    = "${each.value["name"]}-dev.adevops72.online"
   type    = "A"
   zone_id = "Z064328134L0JD7T8XRZ9"
   ttl = 30
-  records = [aws_instance.instance.private_ip]
+  records = [aws_instance.instance[each.value["name"]].private_ip]
 }
 
-output "public_ip" {
+terraform {
+  backend "s3" {
+    bucket = "terraform-mok72"
+    key = "roboshop/dev/terraform.tfstate"
+    region = "us-east-1"
+  }
+}
+
+/*output "public_ip" {
   value = aws_instance.instance.public_ip
 }
 
 output "private_ip" {
   value = aws_instance.instance.private_ip
-}
+}*/
