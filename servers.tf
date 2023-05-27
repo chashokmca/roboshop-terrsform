@@ -16,14 +16,63 @@ variable "instance_type" {
   default = "t3.micro"
 }
 
+variable "instances" {
+  default = {
+    frontend={
+      name="frontend"
+      instance_type = "t3.micro"
+    }
+    mongodb= {
+      name="mongodb"
+      instance_type = "t3.micro"
+    }
+    catalogue= {
+      name  = "catalogue"
+      instance_type = "t3.micro"
+    }
+    dispatch= {
+      name  = "dispatch"
+      instance_type = "t3.micro"
+    }
+    rabbitmq= {
+      name  = "rabbitmq"
+      instance_type = "t3.micro"
+    }
+    cart= {
+      name  = "cart"
+      instance_type = "t3.micro"
+    }
+    user= {
+      name  = "user"
+      instance_type = "t3.micro"
+    }
+    payment= {
+      name  = "catalogue"
+      instance_type = "t3.micro"
+    }
+    dispatch= {
+      name  = "dispatch"
+      instance_type = "t3.micro"
+    }
+    mysql= {
+      name  = "mysql"
+      instance_type = "t3.micro"
+    }
+    redis= {
+      name  = "redis"
+      instance_type = "t3.micro"
+    }
+  }
+}
+
 resource "aws_instance" "instance" {
-  count   = length(var.components)
+  for_each = var.instances
   ami           = data.aws_ami.centos.image_id
-  instance_type = var.instance_type
+  instance_type = each.value["instance_type"]
   vpc_security_group_ids = [data.aws_security_group.selected.id]
 
   tags = {
-    Name = var.components[count.index]
+    Name = each.value["name"]
   }
 }
 
@@ -40,5 +89,5 @@ output "public_ip" {
 }
 
 output "private_ip" {
-  value = aws_instance.frontend.private_ip
+  value = aws_instance.instance.private_ip
 }
